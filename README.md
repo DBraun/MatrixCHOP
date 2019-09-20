@@ -13,7 +13,7 @@ In this image we render a white rectangle at an oblique angle. The MatrixCHOP ta
 ![](MatrixCHOP/images/demo.png)
 
 ## Instructions
-[Build the dll yourself](https://docs.derivative.ca/Write_a_CPlusPlus_Plugin), or use a compiled DLL file. `MatrixCHOP/MatrixCHOP/Plugins/MatrixCHOP.dll` has been compiled as a [Custom Operators](https://docs.derivative.ca/Custom_Operators) for TouchDesigner 2019.19160.
+[Build the dll yourself](https://docs.derivative.ca/Write_a_CPlusPlus_Plugin), or use a compiled DLL file. `MatrixCHOP/MatrixCHOP/Plugins/MatrixCHOP.dll` has been compiled as a [Custom Operator](https://docs.derivative.ca/Custom_Operators) for TouchDesigner 2019.19160.
 
 ## Changelog
 * 2019-09-19 Public release
