@@ -69,8 +69,5 @@ private:
 	int32_t				myExecuteCount;
 
 
-	double				myOffset;
 	Mat4 theMat;
-
-
 };

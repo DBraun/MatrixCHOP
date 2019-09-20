@@ -1,7 +1,7 @@
 class Mat4 {
 
 public:
-	double vals[4][4];
+	float vals[4][4];
 
 	Mat4() {
 		identity();
@@ -29,20 +29,20 @@ public:
 		vals[3][3] = 1.;
 	}
 
-	void translate(double tx, double ty, double tz) {
+	void translate(float tx, float ty, float tz) {
 		vals[0][3] += tx;
 		vals[1][3] += ty;
 		vals[2][3] += tz;
 	}
 
-	void scale(double sx, double sy, double sz) {
+	void scale(float sx, float sy, float sz) {
 		vals[0][0] *= sx;
 		vals[1][1] *= sy;
 		vals[2][2] *= sz;
 	}
 
 	void transpose() {
-		double newMat[4][4];
+		float newMat[4][4];
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				newMat[i][j] = vals[j][i];
@@ -57,11 +57,11 @@ public:
 
 	void multiply(Mat4 postMat) {
 
-		double newMat[4][4];
+		float newMat[4][4];
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 
-				double sum = 0.;
+				float sum = 0.;
 
 				for (int k = 0; k < 4; k++) {
 
@@ -84,7 +84,7 @@ public:
 
 		float result[4] = { 0,0,0,0 };
 		for (int i = 0; i < 4; i++) {
-			double sum = 0.;
+			float sum = 0.;
 			for (int j = 0; j < 4; j++) {
 				sum += vals[i][j] * theVec[j];
 			}

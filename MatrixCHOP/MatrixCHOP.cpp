@@ -41,10 +41,8 @@ FillCHOPPluginInfo(CHOP_PluginInfo *info)
 	info->customOPInfo.authorName->setString("David Braun");
 	info->customOPInfo.authorEmail->setString("github.com/dbraun");
 
-	// This CHOP can work with 0 inputs
+	// This CHOP requires exactly 2 inputs.
 	info->customOPInfo.minInputs = 2;
-
-	// It can accept up to 1 input though, which changes it's behavior
 	info->customOPInfo.maxInputs = 2;
 }
 
@@ -73,7 +71,6 @@ DestroyCHOPInstance(CHOP_CPlusPlusBase* instance)
 MatrixCHOP::MatrixCHOP(const OP_NodeInfo* info) : myNodeInfo(info)
 {
 	myExecuteCount = 0;
-	myOffset = 0.0;
 }
 
 MatrixCHOP::~MatrixCHOP()
@@ -136,8 +133,6 @@ MatrixCHOP::execute(CHOP_Output* output,
 {
 	myExecuteCount++;
 	
-	double	 scale = inputs->getParDouble("Scale");
-
 	// In this case we'll just take the first input and re-output it scaled.
 
 	if (inputs->getNumInputs() > 1)
@@ -154,7 +149,7 @@ MatrixCHOP::execute(CHOP_Output* output,
 		}
 
 		for (int i = 0; i < 16; i++) {
-			theMat.vals[i/4][i%4] = matrixInput->getChannelData(i)[0];
+			theMat.vals[i%4][i/4] = matrixInput->getChannelData(i)[0];
 		}
 
 		int ind = 0;
@@ -181,19 +176,19 @@ MatrixCHOP::execute(CHOP_Output* output,
 				1.
 			};
 
-			float* newJoint = theMat.multByVector(theVec);
+			float* p = theMat.multByVector(theVec);
 
-			newJoint[0] /= newJoint[3];
-			newJoint[1] /= newJoint[3];
-			//newJoint[2] /= newJoint[3];
+			p[0] /= p[3];
+			p[1] /= p[3];
+			p[2] /= p[3];
 
-			newJoint[0] = .5 + newJoint[0] * .5;
-			newJoint[1] = .5 + newJoint[1] * .5;
-			newJoint[2] = .5 + newJoint[2] * .5;
+			p[0] = .5 + p[0] * .5;
+			p[1] = .5 + p[1] * .5;
+			p[2] = .5 + p[2] * .5;
 
-			output->channels[0][i] = newJoint[0];
-			output->channels[1][i] = newJoint[1];
-			output->channels[2][i] = newJoint[2];
+			output->channels[0][i] = p[0];
+			output->channels[1][i] = p[1];
+			output->channels[2][i] = p[2];
 		}
 		
 	}
@@ -204,7 +199,7 @@ MatrixCHOP::getNumInfoCHOPChans(void * reserved1)
 {
 	// We return the number of channel we want to output to any Info CHOP
 	// connected to the CHOP. In this example we are just going to send one channel.
-	return 2;
+	return 1;
 }
 
 void
@@ -220,18 +215,12 @@ MatrixCHOP::getInfoCHOPChan(int32_t index,
 		chan->name->setString("executeCount");
 		chan->value = (float)myExecuteCount;
 	}
-
-	if (index == 1)
-	{
-		chan->name->setString("offset");
-		chan->value = (float)myOffset;
-	}
 }
 
 bool		
 MatrixCHOP::getInfoDATSize(OP_InfoDATSize* infoSize, void* reserved1)
 {
-	infoSize->rows = 2;
+	infoSize->rows = 1;
 	infoSize->cols = 2;
 	// Setting this to false means we'll be assigning values to the table
 	// one row at a time. True means we'll do it one column at a time.
@@ -260,88 +249,17 @@ MatrixCHOP::getInfoDATEntries(int32_t index,
 #endif
 		entries->values[1]->setString(tempBuffer);
 	}
-
-	if (index == 1)
-	{
-		// Set the value for the first column
-		entries->values[0]->setString("offset");
-
-		// Set the value for the second column
-#ifdef _WIN32
-        sprintf_s(tempBuffer, "%g", myOffset);
-#else // macOS
-        snprintf(tempBuffer, sizeof(tempBuffer), "%g", myOffset);
-#endif
-		entries->values[1]->setString( tempBuffer);
-	}
 }
 
 void
 MatrixCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1)
 {
-	// speed
-	{
-		OP_NumericParameter	np;
-
-		np.name = "Speed";
-		np.label = "Speed";
-		np.defaultValues[0] = 1.0;
-		np.minSliders[0] = -10.0;
-		np.maxSliders[0] =  10.0;
-		
-		OP_ParAppendResult res = manager->appendFloat(np);
-		assert(res == OP_ParAppendResult::Success);
-	}
-
-	// scale
-	{
-		OP_NumericParameter	np;
-
-		np.name = "Scale";
-		np.label = "Scale";
-		np.defaultValues[0] = 1.0;
-		np.minSliders[0] = -10.0;
-		np.maxSliders[0] =  10.0;
-		
-		OP_ParAppendResult res = manager->appendFloat(np);
-		assert(res == OP_ParAppendResult::Success);
-	}
-
-	// shape
-	{
-		OP_StringParameter	sp;
-
-		sp.name = "Shape";
-		sp.label = "Shape";
-
-		sp.defaultValue = "Sine";
-
-		const char *names[] = { "Sine", "Square", "Ramp" };
-		const char *labels[] = { "Sine", "Square", "Ramp" };
-
-		OP_ParAppendResult res = manager->appendMenu(sp, 3, names, labels);
-		assert(res == OP_ParAppendResult::Success);
-	}
-
-	// pulse
-	{
-		OP_NumericParameter	np;
-
-		np.name = "Reset";
-		np.label = "Reset";
-		
-		OP_ParAppendResult res = manager->appendPulse(np);
-		assert(res == OP_ParAppendResult::Success);
-	}
 
 }
 
 void 
 MatrixCHOP::pulsePressed(const char* name, void* reserved1)
 {
-	if (!strcmp(name, "Reset"))
-	{
-		myOffset = 0.0;
-	}
+
 }
 
