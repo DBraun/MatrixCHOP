@@ -10,7 +10,7 @@ The output:
 
 # Demo
 In this image we render a white rectangle at an oblique angle. The MatrixCHOP takes the world-space positions of the rectangle's points, the camera's full view-projection-matrix, and then produces 4 new points. These 4 points are then depicted in a separate render of red squares. We've confirmed that the output contains the screen-space coordinates.
-![](images/demo.png)
+![](MatrixCHOP/images/demo.png)
 
 ## Instructions
 [Build the dll yourself](https://docs.derivative.ca/Write_a_CPlusPlus_Plugin), or use a compiled DLL file. `MatrixCHOP/MatrixCHOP/Plugins/MatrixCHOP.dll` has been compiled as a [Custom Operators](https://docs.derivative.ca/Custom_Operators) for TouchDesigner 2019.19160.
