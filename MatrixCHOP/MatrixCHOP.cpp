@@ -178,17 +178,9 @@ MatrixCHOP::execute(CHOP_Output* output,
 
 			float* p = theMat.multByVector(theVec);
 
-			p[0] /= p[3];
-			p[1] /= p[3];
-			p[2] /= p[3];
-
-			p[0] = .5 + p[0] * .5;
-			p[1] = .5 + p[1] * .5;
-			p[2] = .5 + p[2] * .5;
-
-			output->channels[0][i] = p[0];
-			output->channels[1][i] = p[1];
-			output->channels[2][i] = p[2];
+			output->channels[0][i] = .5 + .5 * p[0] / p[3];
+			output->channels[1][i] = .5 + .5 * p[1] / p[3];
+			output->channels[2][i] = .5 + .5 * p[2] / p[3];
 		}
 		
 	}
